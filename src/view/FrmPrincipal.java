@@ -25,11 +25,11 @@ public class FrmPrincipal extends javax.swing.JFrame {
     private javax.swing.JTable tblPacientes = new javax.swing.JTable();
     
     private javax.swing.JButton btnRegistrar = new javax.swing.JButton("Registrar Paciente");
-    private javax.swing.JButton btnHistorial = new javax.swing.JButton("Agregar a Historial");
     private javax.swing.JButton btnEncolar   = new javax.swing.JButton("Encolar en Espera");
     private javax.swing.JButton btnAtender   = new javax.swing.JButton("Atender Siguiente (Cola)");
     private javax.swing.JButton btnDeshacer  = new javax.swing.JButton("Deshacer Ultima Accion");
-    private javax.swing.JButton btnArbol     = new javax.swing.JButton("Insertar en Arbol");
+    private javax.swing.JButton btnVerHistorial = new javax.swing.JButton("Ver Historial");
+    
     private javax.swing.JTextField txtBuscarDni = new javax.swing.JTextField(10);
     private javax.swing.JButton btnBuscar    = new javax.swing.JButton("Buscar por DNI");
     private javax.swing.JTextArea txtResultados = new javax.swing.JTextArea(10, 35);
@@ -67,14 +67,15 @@ public class FrmPrincipal extends javax.swing.JFrame {
         scroll.setPreferredSize(new java.awt.Dimension(400, 200));
         add(scroll);
         
-        add(btnHistorial);
+     
         add(btnEncolar);
         add(btnAtender);
         add(btnDeshacer);
-        add(btnArbol);
         add(new javax.swing.JLabel("Buscar DNI:"));
         add(txtBuscarDni);
         add(btnBuscar);
+        add(btnVerHistorial);
+
 
         txtResultados.setEditable(false);
         javax.swing.JScrollPane scrollResultados = new javax.swing.JScrollPane(txtResultados);
@@ -87,12 +88,12 @@ public class FrmPrincipal extends javax.swing.JFrame {
             }
         });
         
-        btnHistorial.addActionListener(evt -> btnHistorialActionPerformed(evt));
+        
         btnEncolar.addActionListener(evt -> btnEncolarActionPerformed(evt));
         btnAtender.addActionListener(evt -> btnAtenderActionPerformed(evt));
         btnDeshacer.addActionListener(evt -> btnDeshacerActionPerformed(evt));
-        btnArbol.addActionListener(evt -> btnArbolActionPerformed(evt));
         btnBuscar.addActionListener(evt -> btnBuscarActionPerformed(evt));
+        btnVerHistorial.addActionListener(evt -> btnVerHistorialActionPerformed(evt));
     }
 
     private void actualizarTabla() {
@@ -116,6 +117,9 @@ public class FrmPrincipal extends javax.swing.JFrame {
 
             Paciente nuevo = new Paciente(dni, nombre, prioridad);
             listaAtencion.insertar(nuevo);
+            arbolBusqueda.insertar(nuevo);
+            historialGeneral.agregar(nuevo);
+            pilaAcciones.apilar("Registrado: " + dni);
 
             actualizarTabla();
             JOptionPane.showMessageDialog(this, "Paciente en cola de espera.");
@@ -126,15 +130,8 @@ public class FrmPrincipal extends javax.swing.JFrame {
     
     // nuevos
     
-    private void btnHistorialActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            Paciente p = new Paciente(txtDni.getText(), txtNombre.getText(), cboPrioridad.getSelectedIndex() + 1);
-            historialGeneral.agregar(p);
-            pilaAcciones.apilar("Agregado a historial: " + p.getDni());
-            txtResultados.setText(historialGeneral.listar());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al agregar al historial.");
-        }
+    private void btnVerHistorialActionPerformed(java.awt.event.ActionEvent evt) {
+        txtResultados.setText(historialGeneral.listar());
     }
 
     private void btnEncolarActionPerformed(java.awt.event.ActionEvent evt) {
@@ -164,17 +161,6 @@ public class FrmPrincipal extends javax.swing.JFrame {
             txtResultados.setText("Se deshizo: " + accion + "\n\nHistorial de acciones:\n" + pilaAcciones.listar());
         } else {
             txtResultados.setText("No hay acciones para deshacer.");
-        }
-    }
-
-    private void btnArbolActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            Paciente p = new Paciente(txtDni.getText(), txtNombre.getText(), cboPrioridad.getSelectedIndex() + 1);
-            arbolBusqueda.insertar(p);
-            pilaAcciones.apilar("Insertado en arbol: " + p.getDni());
-            txtResultados.setText(arbolBusqueda.listarInorden());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al insertar en el arbol.");
         }
     }
 

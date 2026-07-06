@@ -1,6 +1,5 @@
 package model;
 
-
 public class Nodo {
     private Paciente paciente;
     private Nodo siguiente;
